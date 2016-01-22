@@ -12,6 +12,9 @@
             "homepage": "http://benmort.me"
         }
     ],
+    "repositories": [
+        { "type": "git", "url": "https://github.com/benmort/php-resque-scheduler" }
+    ],
     "require": {
         "symfony/framework-bundle": ">=2.0,<3.0",
         "chrisboulton/php-resque": "dev-master",
