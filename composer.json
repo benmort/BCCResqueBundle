@@ -1,15 +1,15 @@
 {
-    "name": "bcc/resque-bundle",
+    "name": "benmort/resque-bundle",
     "type": "symfony-bundle",
-    "description": "BCCResqueBundle",
+    "description": "resuqe bundle",
     "keywords": ["resque job queue management"],
-    "homepage": "http://github.com/michelsalib/BCCResqueBundle",
+    "homepage": "http://github.com/benmort/resque-bundle",
     "license": "MIT",
     "authors": [
         {
-            "name": "Michel Salib",
-            "email": "michelsalib@hotmail.com",
-            "homepage": "http://michelsalib.com"
+            "name": "Ben Mort",
+            "email": "benjaminmort@gmail.com",
+            "homepage": "http://benmort.me"
         }
     ],
     "require": {
