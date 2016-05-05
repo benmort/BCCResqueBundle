@@ -14,6 +14,7 @@ class DefaultController extends Controller
             'BCCResqueBundle:Default:index.html.twig',
             array(
                 'resque' => $this->getResque(),
+                'flightStats' => $this->getResque()->getFlightStats(),
             )
         );
     }
