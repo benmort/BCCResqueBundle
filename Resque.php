@@ -250,6 +250,34 @@ class Resque
         return $result;
     }
 
+    /*public function getProcessedJobs($start = -100, $count = 100)
+    {
+        $jobs = \Resque::redis()->lrange('processed', $start, $count);
+
+        $result = array();
+
+        foreach ($jobs as $job) {
+            $result[] = new FailedJob(json_decode($job, true));
+        }
+
+        return $result;
+    }*/
+
+    public function getFlightStats()
+    {
+        $arr_keys = \Resque::redis()->keys('cachedFlightMetaData*');
+        $stats = \Resque::redis()->mGet($arr_keys);
+
+        $result = array();
+        if ($stats) {
+            foreach ($stats as $stat) {
+                $result[] = json_decode($stat, true);
+            }
+        }
+
+        return $result;
+    }
+
     /**
      * Attach any applicable retry strategy to the job.
      *

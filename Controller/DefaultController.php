@@ -14,6 +14,12 @@ class DefaultController extends Controller
             'BCCResqueBundle:Default:index.html.twig',
             array(
                 'resque' => $this->getResque(),
+                'flightStats' => $this->getResque()->getFlightStats(),
+                'mapDashboardMetaData' => $this->get('availability_service.helper.cache_meta_data')->getMapDashboardMetaData(),
+                'calendarDashboardMetaData' => $this->get('availability_service.helper.cache_meta_data')->getCalendarDashboardMetaData(),
+                'totalTrips' => $this->get('availability_service.helper.cache_meta_data')->getTotalTrips(),
+                'totalLocations' => $this->get('availability_service.helper.cache_meta_data')->getTotalLocations(),
+                'totalDates' => $this->get('availability_service.helper.cache_meta_data')->getTotalDates()
             )
         );
     }

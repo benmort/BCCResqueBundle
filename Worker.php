@@ -38,6 +38,26 @@ class Worker
         return $this->worker->getStat('processed');
     }
 
+    public function getMemory()
+    {
+        return $this->worker->getStat('memory');
+    }
+
+    public function getMemoryMB()
+    {
+        return $this->getMemory() ? $this->getMemory()/1048576 : 0;
+    }
+
+    public function getDuration()
+    {
+        return $this->worker->getStat('duration');
+    }
+
+    public function getDurationSecs()
+    {
+        return $this->getDuration() ? $this->getDuration()/1000 : 0;
+    }
+
     public function getFailedCount()
     {
         return $this->worker->getStat('failed');
