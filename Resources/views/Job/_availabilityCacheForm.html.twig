@@ -1,0 +1,194 @@
+<div class="container">
+	<form action="{{ path('job_add', {'jobType': jobType}) }}" method="post">
+	    <div class="row">
+
+	        <div class="col-md-6">
+	        	<h4>Brand Targets</h4>
+				<div class="select">
+					<select id="cacheTargets" name="cacheTargets[]" multiple>
+					    <optgroup label="Flight Centre">
+						    <option value="fcau">FC Australia</option>
+						    <option value="fcnz">FC New Zealand</option>
+						    <option value="fcza">FC South Africa</option>
+						    <option value="fcsg">FC Singapore</option>
+					    </optgroup>
+					    <optgroup label="Student Flights">
+						    <option value="sfau">SF Australia</option>
+						    <option value="sfnz">SF New Zealand</option>
+						    <option value="sfza">SF South Africa</option>
+					    </optgroup>
+					    <optgroup label="Escape Travel">
+						    <option value="etau">ET Australia</option>
+					    </optgroup>
+					</select>
+					<br>
+				</div>
+			</div>
+	        <div class="col-md-6">
+	        	<h4>Environment Targets</h4>
+				<div class="select">
+					<select id="environmentTargets" name="environmentTargets[]" multiple>
+					    <optgroup label="Local">
+						    <option value="dev">Dev</option>
+					    </optgroup>
+					    <optgroup label="Integrtaion">
+						    <option value="ben">Ben</option>
+						    <option value="int1">INT1</option>
+						    <option value="int2">INT2</option>
+						    <option value="int3">INT3</option>
+					    </optgroup>
+					    <optgroup label="Staging">
+						    <option value="stg">STG</option>
+						    <option value="pre">PRE</option>
+					    </optgroup>
+					    <optgroup label="Production">
+						    <option value="prd">PRD</option>
+					    </optgroup>
+					</select>
+					<br>
+				</div>
+			</div>
+
+	        <div class="col-md-6">
+	        	<h4>Availability Caching Type</h4>
+				<div class="radio">
+				  <label data-toggle="tooltip" title="This options will make a GET request to the designated Booking Engine deeplink URL which will store it externally">
+				    <input type="radio" name="cacheType" id="cacheType1" value="external" checked >
+				    External Cache Warming (Booking Engine)
+				  </label>
+				</div>
+				<div class="radio disabled">
+				  <label data-toggle="tooltip" title="This option will make a GET request to the designated Phoneix availability URL and store the results locally">
+				    <input type="radio" name="cacheType" id="cacheType2" value="internal" disabled>
+				    Internal Cache Store (Availability Service)
+				  </label>
+				</div>
+			</div>
+
+	        <div class="col-md-6">
+	        	<h4>Date Range Strategy</h4>
+				<div class="radio">
+				  <label data-toggle="tooltip" title="This options should be used for BAU caching. Storing results from today's date to a date in the future dependant on the cache date scope.">
+				    <input type="radio" name="dateRangeStrategy" id="dateRangeStrategy1" value="bau" checked >
+				    Current Date Into The Future (BAU)
+				  </label>
+				</div>
+				<div class="radio disabled">
+				  <label data-toggle="tooltip" title="This option should be used of sale caching. Storing results between two designated dates.">
+				    <input type="radio" name="dateRangeStrategy" id="dateRangeStrategy2" value="sale" disabled>
+				    Specific Start and End Dates (Sale)
+				  </label>
+				</div>
+			</div>
+
+	        <div class="col-md-6">
+	        	<h4>Availability Location</h4>
+				<label name="departureLocation" data-toggle="tooltip" title="The Departure point of the cached results">Departure *</label>
+	        	<div class='input-group location'>
+		            <input class="form-control" type="text" name="departureLocation" placeholder="MEL" autocomplete="off">
+		            <span class="input-group-addon">
+		                <span class="glyphicon glyphicon-map-marker"></span>
+		            </span>
+		        </div>
+				<br/>
+				<label name="arrivalLocation" data-toggle="tooltip" title="The Arrival point of the cached results">Arrival *</label>
+	        	<div class='input-group location'>
+					<input class="form-control" type="text" name="arrivalLocation" placeholder="SYD" autocomplete="off">
+		            <span class="input-group-addon">
+		                <span class="glyphicon glyphicon-map-marker"></span>
+		            </span>
+		        </div>
+				<br/>
+				<label data-toggle="tooltip" title="This option when checked caches 2 seaparate result sets for both ways">
+					<input type="checkbox" name="bothWays" checked>
+					Both Ways
+				</label>
+			</div>
+
+	        <div class="col-md-6">
+	        	<h4>Availability Datetime</h4>
+	        	<div class="bauAvailabilityDateTime collapse in">
+					<label name="todaysDate" data-toggle="tooltip" title="The Date of the cached results commence">Today's Date *</label>
+					<input class="form-control" type="hidden" name="todaysDate" value="{{ "now"|date("d/m/Y") }}" disabled>
+					<p class="form-control-static">{{ "now"|date("d/m/Y") }}</p>
+			      	<br>
+					<label name="dayCacheScope" data-toggle="tooltip" title="The number of days from today's date the cached results finish">Day Cache Scope* <small>(Days - leave blank for 14 days)</small></label>
+					<input class="form-control" type="text" name="dayCacheScope" placeholder="14">
+			    </div>
+	        	<div class="saleAvailabilityDateTime collapse">
+					<label name="saleStartDate" data-toggle="tooltip" title="The Date of the cached results commence">Sale Start Date *</label>
+		        	<div class='input-group date date-only datetimepicker'>
+						<input class="form-control" type="text" name="saleStartDate" placeholder="20/09/2016">
+			            <span class="input-group-addon">
+			                <span class="glyphicon glyphicon-calendar"></span>
+			            </span>
+			        </div>
+			      	<br>
+					<label name="saleEndDate" data-toggle="tooltip" title="The Date of the cached results finish">Sale End Date *</label>
+		        	<div class='input-group date date-only datetimepicker'>
+						<input class="form-control" type="text" name="saleEndDate" placeholder="20/10/2016">
+			            <span class="input-group-addon">
+			                <span class="glyphicon glyphicon-calendar"></span>
+			            </span>
+			        </div>
+			    </div>
+			</div>
+
+		</div>
+
+	    <div class="row">
+
+	        <div class="col-md-6">
+	        	<h4>Job Operation</h4>
+				<label name="operationDateTimeStart" data-toggle="tooltip" title="The DateTime at which the job will start operating">DateTime Start <small>(Leave blank for immeadiate start)</small></label>
+	        	<div class='input-group date date-time datetimepicker disabled'>
+		            <input type='text' class="form-control" name="operationDateTimeStart" placeholder="27/05/2016 12:00 AM" disabled/>
+		            <span class="input-group-addon">
+		                <span class="glyphicon glyphicon-calendar"></span>
+		                <span class="glyphicon glyphicon-time"></span>
+		            </span>
+		        </div>
+				<br/>
+				<label name="operationDateTimeEnd" data-toggle="tooltip" title="The DateTime at which the job will discontinue operating">DateTime End <small>(Leave blank for eternal recurrence)</small></label>
+	        	<div class='input-group date date-time datetimepicker disabled'>
+		            <input type='text' class="form-control" name="operationDateTimeStart" placeholder="27/06/2016 12:00 AM" disabled/>
+		            <span class="input-group-addon">
+		                <span class="glyphicon glyphicon-calendar"></span>
+		                <span class="glyphicon glyphicon-time"></span>
+		            </span>
+		        </div>
+			</div>
+
+	        <div class="col-md-6">
+	        	<h4>Job Options</h4>
+				<label name="interval" data-toggle="tooltip" title="How often the job runs to refresh the cache store">Interval <small>(Minutes - leave blank for 5 mins)</small></label>
+				<input class="form-control" type="text" name="interval" placeholder="5">
+				<br/>
+				<label name="operationDailyTimeStart" data-toggle="tooltip" title="The Time at which the job starts operating on a daily basis">Daily Time Range Start <small>(Leave both blank for 24hr operation)</small></label>
+	        	<div class='input-group date time-only datetimepicker disabled'>
+					<input class="form-control" type="text" name="operationDailyTimeStart" placeholder="6:00 AM" disabled>
+		            <span class="input-group-addon">
+		                <span class="glyphicon glyphicon-time"></span>
+		            </span>
+		        </div>
+				<br/>
+				<label name="operationDailyTimeEnd" data-toggle="tooltip" title="The Time at which the job discontinues operating on a daily basis">Daily Time Range End <small>(Leave both blank for 24hr operation)</small></label>
+	        	<div class='input-group date time-only datetimepicker disabled'>
+		            <input class="form-control" type="text" name="operationDailyTimeEnd" placeholder="12:00 AM" disabled>
+		            <span class="input-group-addon">
+		                <span class="glyphicon glyphicon-time"></span>
+		            </span>
+		        </div>
+			</div>
+
+		</div>
+
+	    <div class="row" style="padding-bottom:100px;">
+
+	        <div class="col-md-6">
+				<input type="submit" class="btn btn-success" value="Submit">
+			</div>
+
+		</div>
+	</form>
+</div>

@@ -1,0 +1,91 @@
+{% extends 'BCCResqueBundle::layout.html.twig' %}
+{% block javascripts %}
+    <script src="{{ asset('www/js/main.min.js') }}"></script>
+{% endblock %}
+{% block body %}
+{% include "BCCResqueBundle:Default:_menu.html.twig" with {activeNav: 'statistics'} %}
+<div class="container">
+    <div class="row">
+        <h2>Departing {{ date }} <small>- {{departTotal}} Flights</small></h2>
+    </div>
+    {% if calendarDashboardMetaData is not empty %}
+        <script type='text/javascript' src='https://www.gstatic.com/charts/loader.js'></script>
+        <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+        <script type='text/javascript'>
+            google.charts.load('current', {'packages': ['calendar']});
+            google.charts.setOnLoadCallback(initializeCalendarChart);
+
+            /* CALENDAR */
+            function initializeCalendarChart() {
+                var calendarData = new google.visualization.DataTable();
+                calendarData.addColumn({ type: 'date', id: 'Date' });
+                calendarData.addColumn({ type: 'number', id: 'departingFlights' });
+                calendarData.addRows([
+                    {% for stat in calendarDashboardMetaData %}
+                        {% set year = stat['departDate']|split('-')[2] %}
+                        {% set month = stat['departDate']|split('-')[1] %}
+                        {% set day = stat['departDate']|split('-')[0] %}
+                        [new Date({{year}}, {{month}}, {{day}}), {{stat.totalTrips}}],
+                    {% endfor %}
+                ]);
+
+                var calendarOptions = {
+                    height: 350
+                };
+
+                var calendarChart = new google.visualization.Calendar(document.getElementById('calendar-chart-container'));
+
+                google.visualization.events.addListener(calendarChart, 'select', selectCalendarHandler);
+
+                function selectCalendarHandler(e) {
+                    var selection = calendarChart.getSelection()[0],
+                        calendarDashboardMetaData = [{% for stat in calendarDashboardMetaData %} '{{ stat.departDate }}', {% endfor %}],
+                        selectedDate = calendarDashboardMetaData[selection.row];
+                    window.location = '/statistics/date/'+selectedDate;
+                }
+
+                calendarChart.draw(calendarData, calendarOptions);
+            };
+        </script>
+        <div id="calendar-chart-container" style="width: 1000px; height: 200px; margin: 0 auto; background: white;"></div>
+    {% else %}
+        <td colspan="12">
+            <em>Calendar Not Available...</em>
+        </td>
+    {% endif %}
+    <div class="row">
+        <table class="table table-striped table-bordered">
+            <tr>
+                <th class="col-md-1">Origin</th>
+                <th class="col-md-1">Destination</th>
+                <th class="col-md-2">Flights Cached</th>
+                <th class="col-md-4">Airlines</th>
+                <th class="col-md-2">Date</th>
+                <th class="col-md-2">Timestamp</th>
+            </tr>
+            {% for flightStat in departStatistics %}
+                {% if flightStat is iterable %}
+                    <tr>
+                        <td class="col-md-1">{{ flightStat['origin'] }}</td>
+                        <td class="col-md-1">{{ flightStat['destination'] }}</td>
+                        <td class="col-md-2">{{ flightStat['tripCount'] }}</td>
+                        <td class="col-md-4">
+                            {% for airline,flights in flightStat['airlines'] %}
+                                <span>{{ airline }} - {{flights}} | </span>
+                            {% endfor %}
+                        </td>
+                        <td class="col-md-2">{{ flightStat['departDate'] }}</td>
+                        <td class="col-md-2">{{ flightStat['timestamp'] }}</td>
+                    </tr>
+                {% endif %}
+            {% else %}
+                <tr>
+                    <td colspan="12">
+                        <em>empty...</em>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+{% endblock %}

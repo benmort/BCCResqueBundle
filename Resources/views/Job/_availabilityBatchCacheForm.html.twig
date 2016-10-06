@@ -1,0 +1,16 @@
+<div class="container">
+	<form action="{{ path('job_add_batch', {'jobType': jobType}) }}" method="post">
+	    <div class="row">
+			<label data-toggle="tooltip" title="Choose a correctly formatted file to upload and create multiple jobs" name="jobsCSV"></label>
+			<input id="jobsCSV" name="jobsCSV" type="file">
+		</div>
+
+	    <div class="row" style="padding-bottom:100px;">
+
+	        <div class="col-md-6">
+				<input type="submit" class="btn btn-success" value="Submit">
+			</div>
+
+		</div>
+	</form>
+</div>

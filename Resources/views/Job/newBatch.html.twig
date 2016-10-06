@@ -1,0 +1,15 @@
+{% extends 'BCCResqueBundle::layout.html.twig' %}
+{% block javascripts %}
+    <script src="{{ asset('www/js/main.min.js') }}"></script>
+    <script src="{{ asset('www/js/job_new.min.js') }}"></script>
+{% endblock %}
+{% block body %}
+{% include "BCCResqueBundle:Default:_menu.html.twig" with {activeNav: jobType} %}
+<div class="container">
+    <div class="row">
+        <h2>New Batch {{ jobType|title }} Job</h2>
+        <p><a href="{{ path('job_list', {'jobType': jobType}) }}">Back to all {{ jobType|title }} Jobs</a></p>
+        {% include "BCCResqueBundle:Job:_availabilityBatchCacheForm.html.twig" %}
+    </div>
+</div>
+{% endblock %}

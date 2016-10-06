@@ -1,0 +1,121 @@
+{% extends 'BCCResqueBundle::layout.html.twig' %}
+{% block javascripts %}
+    <script src="{{ asset('www/js/main.min.js') }}"></script>
+{% endblock %}
+{% block body %}
+{% include "BCCResqueBundle:Default:_menu.html.twig" with {activeNav: 'statistics'} %}
+<div class="container">
+    <div class="row">
+        <h2>{{ location }}</h2>
+    </div>
+    {% if mapDashboardMetaData is not empty %}
+        <script type='text/javascript' src='https://www.gstatic.com/charts/loader.js'></script>
+        <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+        <script type='text/javascript'>
+            google.charts.load('current', {'packages': ['geochart']});
+            google.charts.setOnLoadCallback(initializeMapChart);
+
+            function initializeMapChart() {
+                var mapData = google.visualization.arrayToDataTable([
+                    ['City', 'Departing', 'Arriving'],
+                    {% for stat in mapDashboardMetaData %}
+                        ['{{stat.location}}', {{stat.departingFlights}}, {{stat.arrivingFlights}}],
+                    {% endfor %}
+                ]);
+                var mapOptions = {
+                    region: 'AU',
+                    displayMode: 'markers',
+                    colorAxis: {colors: ['white', 'blue']},
+                    height: 400,
+                    legend: 'none'
+                };
+
+                var mapChart = new google.visualization.GeoChart(document.getElementById('map-chart-container'));
+
+                google.visualization.events.addListener(mapChart, 'select', selectMapHandler);
+
+                function selectMapHandler(e) {
+                    var selection = mapChart.getSelection()[0],
+                        mapDashboardMetaData = [{% for stat in mapDashboardMetaData %} '{{ stat.location }}', {% endfor %}],
+                        selectedLocation = mapDashboardMetaData[selection.row],
+                        selectedIataLocation = selectedLocation.substr(selectedLocation.indexOf("-") + 2);
+                    window.location = '/statistics/location/'+selectedIataLocation;
+                }
+                mapChart.draw(mapData, mapOptions);
+            };
+        </script>
+        <div id="map-chart-container" style="width: 700px; height: 400px; margin: 0 auto;"></div>
+    {% else %}
+        <td colspan="12">
+            <em>Map Not Available...</em>
+        </td>
+    {% endif %}
+    <div class="row">
+        <h3>Location Pairs</h3>
+        {% for locationPair in locationPairs %}
+            <a href="{{ path('stats_show_location_pair', {'locationA': location, 'locationB': locationPair}) }}">{{ locationPair }}</a>
+        {% endfor %}
+    </div>
+
+    <div class="row">
+        <h3>Departing</h3>
+        <table class="table table-striped table-bordered">
+            <tr>
+                <th class="col-md-3">Destination</th>
+                <th class="col-md-2">Flights Cached</th>
+                <th class="col-md-3">Airlines</th>
+                <th class="col-md-2">Date</th>
+                <th class="col-md-2">Timestamp</th>
+            </tr>
+            {% for flightStat in originStatistics %}
+                {% if flightStat is iterable %}
+                    <tr>
+                        <td class="col-md-3">{{ flightStat['destination'] }}</td>
+                        <td class="col-md-2">{{ flightStat['tripCount'] }}</td>
+                        <td class="col-md-3">
+                            {% for airline,flights in flightStat['airlines'] %}
+                                <span>{{ airline }} - {{flights}} | </span>
+                            {% endfor %}
+                        </td>
+                        <td class="col-md-2">{{ flightStat['departDate'] }}</td>
+                        <td class="col-md-2">{{ flightStat['timestamp'] }}</td>
+                    </tr>
+                {% endif %}
+            {% else %}
+                <tr>
+                    <td colspan="12">
+                        <em>empty...</em>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="row">
+        <h3>Arriving</h3>
+        <table class="table table-striped table-bordered">
+            <tr>
+                <th class="col-md-3">Origin</th>
+                <th class="col-md-2">Date</th>
+                <th class="col-md-2">Flights Cached</th>
+                <th class="col-md-2">Timestamp</th>
+            </tr>
+            {% for flightStat in destinationStatistics %}
+                {% if flightStat is iterable %}
+                    <tr>
+                        <td class="col-md-3">{{ flightStat['origin'] }}</td>
+                        <td class="col-md-2">{{ flightStat['departDate'] }}</td>
+                        <td class="col-md-2">{{ flightStat['tripCount'] }}</td>
+                        <td class="col-md-2">{{ flightStat['timestamp'] }}</td>
+                    </tr>
+                {% endif %}
+            {% else %}
+                <tr>
+                    <td colspan="12">
+                        <em>empty...</em>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+{% endblock %}

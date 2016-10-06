@@ -1,9 +1,11 @@
 {% extends 'BCCResqueBundle::layout.html.twig' %}
 {% block body %}
-{% include "BCCResqueBundle:Default:_menu.html.twig" with {activeNav: 'recurring_list'} %}
+{% include "BCCResqueBundle:Default:_menu.html.twig" with {activeNav: jobType} %}
 <div class="container">
-    <div class="row span3">
-        <h2>Recurring Jobs</h2>
+    <div class="row">
+        <h2>{{ jobType|title }} Jobs
+            <a href="{{ path('job_new', {'jobType': jobType}) }}" class="btn btn-success">Create {{ jobType|title }} Job</a>
+        </h2>
         <table class="table table-striped table-bordered">
             <thead>
             <tr>
@@ -14,11 +16,11 @@
             <tbody>
             {% for timestamp in timestamps %}
                 <tr>
-                    <th class="span2">
-                        <a href="{{ path('job_recurring_timestamp', {timestamp: timestamp[0]}) }}">
+                    <th class="col-md-2">
+                        <a href="{{ path('job_show', {jobType: jobType, timestamp: timestamp[0]}) }}">
                             {{ timestamp[0]|date('Y-m-d H:i:s') }}</a>
                     </th>
-                    <td class="span1">{{ timestamp[1] }}</td>
+                    <td class="col-md-1">{{ timestamp[1] }}</td>
                 </tr>
             {% endfor %}
             </tbody>
