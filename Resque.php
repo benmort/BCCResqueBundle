@@ -296,18 +296,4 @@ class Resque
             $job->args['bcc_resque.retry_strategy'] = $this->globalRetryStrategy;
         }
     }
-
-    public function getFlightStats()
-    {
-        $arr_keys = \Resque::redis()->keys('cachedFlightMetaData*');
-        $stats = \Resque::redis()->mGet($arr_keys);
-
-        $result = array();
-        if ($stats) {
-            foreach ($stats as $stat) {
-                $result[] = json_decode($stat, true);
-            }
-        }
-        return $result;
-    }
 }
