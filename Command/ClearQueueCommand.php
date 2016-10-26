@@ -26,6 +26,7 @@ class ClearQueueCommand extends ContainerAwareCommand
         $count=$resque->clearQueue($queue);
 
         $output->writeln('Cleared queue '.$queue.' - removed '.$count.' entries');
+        fwrite(STDOUT, 'Cleared queue '.$queue.' - removed '.$count.' entries');
 
         return 0;
     }

@@ -23,6 +23,7 @@ class StopScheduledWorkerCommand extends ContainerAwareCommand
         $pidFile=$this->getContainer()->get('kernel')->getCacheDir().'/bcc_resque_scheduledworker.pid';
         if (!file_exists($pidFile)) {
             $output->writeln('No PID file found');
+            fwrite(STDOUT, 'No PID file found');
 
             return -1;
         }
@@ -30,7 +31,8 @@ class StopScheduledWorkerCommand extends ContainerAwareCommand
         $pid=file_get_contents($pidFile);
 
         $output->writeln('Killing process '.$pid);
-
+        fwrite(STDOUT, 'Killing process '.$pid);
+        
         \posix_kill($pid,SIGTERM);
 
         unlink($pidFile);

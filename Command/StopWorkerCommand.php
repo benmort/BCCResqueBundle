@@ -34,11 +34,14 @@ class StopWorkerCommand extends ContainerAwareCommand
                 if (!empty($availableWorkers)) {
                     $output->writeln('<error>You need to give an existing worker.</error>');
                     $output->writeln('Running workers are:');
+                    fwrite(STDOUT, '<error>You need to give an existing worker.</error>');
+                    fwrite(STDOUT, 'Running workers are:');
                     foreach ($resque->getWorkers() as $worker) {
                         $output->writeln($worker->getId());
                     }
                 } else {
                     $output->writeln('<error>There is no running worker.</error>');
+                    fwrite(STDOUT, '<error>There is no running worker.</error>');
                 }
 
                 return 1;
@@ -49,6 +52,7 @@ class StopWorkerCommand extends ContainerAwareCommand
 
         foreach ($workers as $worker) {
             $output->writeln(\sprintf('Stopping %s...', $worker->getId()));
+            fwrite(STDOUT, 'Stopping %s...', $worker->getId());
             $worker->stop();
         }
 

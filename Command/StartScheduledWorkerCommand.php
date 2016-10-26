@@ -72,22 +72,23 @@ class StartScheduledWorkerCommand extends ContainerAwareCommand
             $workerCommand = 'nohup ' . $workerCommand . ' > ' . $logFile .' 2>&1 & echo $!';
         }
 
-		// In windows: When you pass an environment to CMD it replaces the old environment
-		// That means we create a lot of problems with respect to user accounts and missing vars
-		// this is a workaround where we add the vars to the existing environment.
-		if (defined('PHP_WINDOWS_VERSION_BUILD'))
-		{
-			foreach($env as $key => $value)
-			{
-				putenv($key."=". $value);
-			}
-			$env = null;
-		}
+        // In windows: When you pass an environment to CMD it replaces the old environment
+        // That means we create a lot of problems with respect to user accounts and missing vars
+        // this is a workaround where we add the vars to the existing environment.
+        if (defined('PHP_WINDOWS_VERSION_BUILD'))
+        {
+            foreach($env as $key => $value)
+            {
+                putenv($key."=". $value);
+            }
+            $env = null;
+        }
 
 
         $process = new Process($workerCommand, null, $env, null, null);
 
         $output->writeln(\sprintf('Starting worker <info>%s</info>', $process->getCommandLine()));
+        fwrite(STDOUT, 'Starting worker <info>%s</info>', $process->getCommandLine());
 
         if ($input->getOption('foreground')) {
             $process->run(function ($type, $buffer) use ($output) {
@@ -105,6 +106,7 @@ class StartScheduledWorkerCommand extends ContainerAwareCommand
             }
             $output->writeln(\sprintf('<info>Worker started</info> %s:%s', $hostname, $pid));
             file_put_contents($pidFile,$pid);
+            fwrite(STDOUT, '<info>Worker started</info> %s:%s', $hostname, $pid);
         }
     }
 }
