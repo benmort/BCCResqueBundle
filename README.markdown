@@ -109,6 +109,7 @@ bcc_resque:
         host: localhost                      # the redis host
         port: 6379                           # the redis port
         database: 1                          # the redis database
+        password: ~                          # the redis password
     auto_retry: [0, 10, 60]                  # auto retry failed jobs
     worker:
         root_dir: path/to/worker/root        # the root dir of app that run workers (optional)

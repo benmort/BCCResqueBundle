@@ -44,69 +44,80 @@ class StartScheduledWorkerCommand extends ContainerAwareCommand
             $env['PREFIX'] = $this->getContainer()->getParameter('bcc_resque.prefix');
         }
 
-        $redisHost = $this->getContainer()->getParameter('bcc_resque.resque.redis.host');
-        $redisPort = $this->getContainer()->getParameter('bcc_resque.resque.redis.port');
+        $redisHost     = $this->getContainer()->getParameter('bcc_resque.resque.redis.host');
+        $redisPort     = $this->getContainer()->getParameter('bcc_resque.resque.redis.port');
         $redisDatabase = $this->getContainer()->getParameter('bcc_resque.resque.redis.database');
+        $redisPassword = $this->getContainer()->getParameter('bcc_resque.resque.redis.password');
+
         if ($redisHost != null && $redisPort != null) {
             $env['REDIS_BACKEND'] = $redisHost.':'.$redisPort;
         }
         if (isset($redisDatabase)) {
             $env['REDIS_BACKEND_DB'] = $redisDatabase;
         }
-
+        if (isset($redisPassword)) {
+            $env['REDIS_BACKEND_PASSWORD'] = $redisPassword;
+        }
+        
         if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
             $phpExecutable = PHP_BINARY;
         } else {
-            $phpExecutable = PHP_BINDIR.'/php';
+            $phpExecutable = PHP_BINDIR . '/php';
             if (defined('PHP_WINDOWS_VERSION_BUILD')) {
                 $phpExecutable = 'php';
             }
         }
 
-        $workerCommand = $phpExecutable.' '.__DIR__.'/../bin/resque-scheduler';
+        $workerCommand = strtr('%php% %dir%/resque-scheduler', array(
+            '%php%' => $phpExecutable,
+            '%dir%' => __DIR__ . '/../bin',
+        ));
 
         if (!$input->getOption('foreground')) {
-            $logFile = $this->getContainer()->getParameter(
-                'kernel.logs_dir'
-            ) . '/resque-scheduler_' . $this->getContainer()->getParameter('kernel.environment') . '.log';
-            $workerCommand = 'nohup ' . $workerCommand . ' > ' . $logFile .' 2>&1 & echo $!';
+            $workerCommand = strtr('%nohup%%cmd% > %logs_dir%/resque-scheduler_%env%.log 2>&1 & echo $!', array(
+                '%nohup%'    => self::commandExists('nohup') ? 'nohup ' : '',
+                '%cmd%'      => $workerCommand,
+                '%logs_dir%' => $this->getContainer()->getParameter('kernel.logs_dir'),
+                '%env%'      => $this->getContainer()->getParameter('kernel.environment')
+            ));
         }
 
         // In windows: When you pass an environment to CMD it replaces the old environment
         // That means we create a lot of problems with respect to user accounts and missing vars
         // this is a workaround where we add the vars to the existing environment.
-        if (defined('PHP_WINDOWS_VERSION_BUILD'))
-        {
-            foreach($env as $key => $value)
-            {
-                putenv($key."=". $value);
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            foreach($env as $key => $value) {
+                putenv($key . '=' . $value);
             }
             $env = null;
         }
 
-
         $process = new Process($workerCommand, null, $env, null, null);
 
-        $output->writeln(\sprintf('Starting worker <info>%s</info>', $process->getCommandLine()));
-        fwrite(STDOUT, 'Starting worker <info>%s</info>', $process->getCommandLine());
+        $output->writeln(sprintf('Starting worker <info>%s</info>', $process->getCommandLine()));
 
         if ($input->getOption('foreground')) {
             $process->run(function ($type, $buffer) use ($output) {
                     $output->write($buffer);
                 });
-        }
-        // else we recompose and display the worker id
-        else {
+        } else {
+            // else we recompose and display the worker id
             $process->run();
-            $pid = \trim($process->getOutput());
+            $pid = trim($process->getOutput());
             if (function_exists('gethostname')) {
                 $hostname = gethostname();
             } else {
                 $hostname = php_uname('n');
             }
-            $output->writeln(\sprintf('<info>Worker started</info> %s:%s', $hostname, $pid));
+            $output->writeln(sprintf('<info>Worker started</info> %s:%s', $hostname, $pid));
             file_put_contents($pidFile,$pid);
-            fwrite(STDOUT, '<info>Worker started</info> %s:%s', $hostname, $pid);
         }
+    }
+
+    private static function commandExists($cmd)
+    {
+        $returnVal = shell_exec("which $cmd");
+        
+        return !empty($returnVal);
     }
 }
