@@ -266,6 +266,11 @@ class Resque
     public function getFlightStats()
     {
         $arr_keys = \Resque::redis()->keys('cachedFlightMetaData*');
+
+        if (!$arr_keys) {
+            return [];
+        }
+        
         $stats = \Resque::redis()->mGet($arr_keys);
 
         $result = array();
