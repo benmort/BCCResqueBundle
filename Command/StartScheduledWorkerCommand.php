@@ -87,9 +87,6 @@ class StartScheduledWorkerCommand extends ContainerAwareCommand
 
         $process = new Process($workerCommand, null, $env, null, null);
 
-        $output->writeln(\sprintf('Starting worker <info>%s</info>', $process->getCommandLine()));
-        fwrite(STDOUT, 'Starting worker <info>%s</info>', $process->getCommandLine());
-
         if ($input->getOption('foreground')) {
             $process->run(function ($type, $buffer) use ($output) {
                     $output->write($buffer);
@@ -104,9 +101,6 @@ class StartScheduledWorkerCommand extends ContainerAwareCommand
             } else {
                 $hostname = php_uname('n');
             }
-            $output->writeln(\sprintf('<info>Worker started</info> %s:%s', $hostname, $pid));
-            file_put_contents($pidFile,$pid);
-            fwrite(STDOUT, '<info>Worker started</info> %s:%s', $hostname, $pid);
         }
     }
 }
